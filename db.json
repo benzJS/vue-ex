@@ -1,8 +1,27 @@
 {
     "users": [
         {
+            "id": 1,
             "email": "asd@gmail.com",
-            "password": "asd"
+            "password": "asd",
+            "fullname": "Anonymous",
+            "todos": [
+                {
+                  "id": 1,
+                  "title": "Learn Node",
+                  "isComplete": false
+                },
+                {
+                  "id": 2,
+                  "title": "Learn Vue",
+                  "isComplete": false
+                },
+                {
+                  "id": 3,
+                  "title": "Learn React",
+                  "isComplete": false
+                }
+              ]
         }
     ]
 }
