@@ -59,29 +59,35 @@ const columns = [
 ];
 export default {
   name: "TodoList",
-//   components: {
-//       Consumer
-//   },
   data() {
     return {
-      selectedRowKeys: [],
       input: "",
       filter: "all",
-      todos: Vue.util.extend([], this.data),
+      todos: [],
       columns
     }
   },
-  mounted() {
+  computed: {
+    selectedRowKeys() {
+      return this.todos
+        .filter(item => item.isComplete)
+        .map(item => this.todos.findIndex(i => i.id === item.id) + 1);
+    }
   },
-  props: ['data', 'tableLoading'],
+  watch: {
+    data() {
+      this.todos = this.data;
+    }
+  },
+  props: ['data', 'tableLoading', 'onDataChange'],
   methods: {
     getDataSource() {
       switch (this.filter) {
         case "active":
-          this.todos.filter(item => !item.isComplete);
+          return this.todos.filter(item => !item.isComplete);
           break;
         case "completed":
-          this.todos.filter(item => item.isComplete);
+          return this.todos.filter(item => item.isComplete);
           break;
         default:
           return this.todos;
@@ -92,12 +98,14 @@ export default {
         item.isComplete = selected;
         return item;
       });
+      this.onDataChange(this.todos);
     },
     onRowSelect({ id }, selected) {
       this.todos = this.todos.map(item => {
         if (item.id === id) item.isComplete = selected;
         return item;
       });
+      this.onDataChange(this.todos);
     },
     onSelectChange(selectedRowKeys) {
       this.selectedRowKeys = selectedRowKeys;
@@ -125,10 +133,12 @@ export default {
         isComplete: false
       });
       this.input = "";
+      this.onDataChange(this.todos);
     },
     deleteTodo(id) {
       const itemIndex = this.todos.findIndex(item => item.id === id);
       this.todos.splice(itemIndex, 1);
+      this.onDataChange(this.todos);
     }
   }
 };

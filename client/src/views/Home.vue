@@ -2,7 +2,7 @@
   <div class="home">
     <a-row type="flex" justify="center" align="middle" style="height: 100%">
       <a-col :span="8">
-        <TodoList  v-if="token" :data="todos" />
+        <TodoList v-if="token" :data="todos" :tableLoading="tableLoading" :onDataChange="onDataChange" />
         <a-card v-else>
           <a-form :form="form" layout="vertical" @submit.prevent="handleSubmit">
             <a-form-item
@@ -64,14 +64,10 @@ export default {
   methods: {
     checkToken() {
       const token = localStorage.getItem('token');
-      const decoded = jwt.decode(token);
-      console.log(decoded);
-      if(!decoded) {
-        localStorage.removeItem('token');
-        return;
+      if(token) {
+        this.token = token;
+        this.fetchData();
       }
-      this.token = token;
-      this.fetchData();
     },
     fetchData() {
       this.tableLoading = true;
@@ -85,13 +81,39 @@ export default {
           validateStatus: () => true
         }
       ).then(res => {
-        const { data } = res;
+        const { data: { data } } = res;
         if(res.status === 200) {
-          this.todos = data.data.todos;
+          this.tableLoading = false;
+          this.todos = data.todos;
         } else {
-          console.log(res.data);
+          this.tableLoading = false;
+          this.token = '';
+          localStorage.removeItem('token');
         }
       });
+    },
+    onDataChange(data) {
+      console.log(data);
+      this.todos = data;
+      const user = jwt.decode(this.token);
+      axios.put(
+        `http://localhost:3000/users/${user.id}/todos`,
+        {
+          todos: this.todos
+        },
+        {
+          headers: {
+            'x-access-token': this.token
+          },
+          validateStatus: () => true
+        })
+          .then(res => {
+            if(res.status === 200) {
+              console.log('OK')
+            } else {
+              console.log(res.data)
+            }
+          })
     },
     handleSubmit(e) {
       const { form: { validateFields } } = this;
@@ -104,6 +126,7 @@ export default {
             if(data.token) {
               localStorage.setItem('token', data.token);
               this.token = data.token;
+              this.fetchData();
             };
           })
         }

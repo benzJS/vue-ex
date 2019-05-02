@@ -8,6 +8,8 @@ const todoController = require('../../controllers/user/todo.controller');
 
 router.get('/:id/todos', todoController.get);
 
+router.put('/:id/todos', todoController.put);
+
 router.get('/:id', controller.get);
 
 module.exports = router;
