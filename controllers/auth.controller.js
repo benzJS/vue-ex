@@ -1,7 +1,12 @@
 require('dotenv').config();
 
 const low = require('../db');
-const { db } = low;
+try {
+    const { db } = low.adapter();
+    console.log(db);
+} catch(err) {
+    console.log(err);
+}
 const jwt = require('jsonwebtoken');
 
 module.exports.signin = async function(req, res, next) {
@@ -19,12 +24,12 @@ module.exports.signin = async function(req, res, next) {
             message: 'Invalid email or password'
         })
     }
-    const token = jwt.sign({ id: user.id, email: user.email, fullname: user.fullname }, process.env.TOKEN_SECRECT, {
+    const token = jwt.sign({ id: user.id, email: user.email, fullname: user.fullname }, process.env.TOKEN_SECRET, {
         expiresIn: '15s'
-    })
-    return res.status(200).json({
+    });
+    return res.json({
         success: true,
-        message: 'Sign in successfully',
+        message: 'Authentication successful',
         token
-    })
+    });
 }
