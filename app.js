@@ -18,7 +18,7 @@ const PORT = process.env.PORT || 3000;
 
 const authMiddleware = require('./middlewares/auth.middleware');
 
-const userRoute = require('./routes/user/index.route');
+const userRoute = require('./routes/user.route');
 const authRoute = require('./routes/auth.route');
 
 app.use(cors());

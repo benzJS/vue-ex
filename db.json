@@ -19,8 +19,7 @@
         {
           "id": 3,
           "title": "Learn React",
-          "isComplete": false,
-          "hover": false
+          "isComplete": false
         }
       ]
     }

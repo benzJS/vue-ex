@@ -68,18 +68,23 @@ export default {
     }
   },
   computed: {
-    selectedRowKeys() {
-      return this.todos
-        .filter(item => item.isComplete)
-        .map(item => this.todos.findIndex(i => i.id === item.id) + 1);
+    selectedRowKeys: {
+      get() {
+        return this.todos
+          .filter(item => item.isComplete)
+          .map(item => this.todos.findIndex(i => i.id === item.id) + 1);
+      },
+      set() {
+
+      }
     }
   },
   watch: {
-    data() {
-      this.todos = this.data;
+    dataSource() {
+      this.todos = this.dataSource;
     }
   },
-  props: ['data', 'tableLoading', 'onDataChange'],
+  props: ['dataSource', 'tableLoading', 'onDataChange'],
   methods: {
     getDataSource() {
       switch (this.filter) {
@@ -98,14 +103,20 @@ export default {
         item.isComplete = selected;
         return item;
       });
-      this.onDataChange(this.todos);
+      this.onDataChange(this.todos.map(item => {
+        delete item['hover'];
+        return item;
+      }));
     },
     onRowSelect({ id }, selected) {
       this.todos = this.todos.map(item => {
         if (item.id === id) item.isComplete = selected;
         return item;
       });
-      this.onDataChange(this.todos);
+      this.onDataChange(this.todos.map(item => {
+        delete item['hover'];
+        return item;
+      }));
     },
     onSelectChange(selectedRowKeys) {
       this.selectedRowKeys = selectedRowKeys;
@@ -133,12 +144,18 @@ export default {
         isComplete: false
       });
       this.input = "";
-      this.onDataChange(this.todos);
+      this.onDataChange(this.todos.map(item => {
+        delete item['hover'];
+        return item;
+      }));
     },
     deleteTodo(id) {
       const itemIndex = this.todos.findIndex(item => item.id === id);
       this.todos.splice(itemIndex, 1);
-      this.onDataChange(this.todos);
+      this.onDataChange(this.todos.map(item => {
+        delete item['hover'];
+        return item;
+      }));
     }
   }
 };

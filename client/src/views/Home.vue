@@ -2,45 +2,20 @@
   <div class="home">
     <a-row type="flex" justify="center" align="middle" style="height: 100%">
       <a-col :span="8">
-        <TodoList v-if="token" :data="todos" :tableLoading="tableLoading" :onDataChange="onDataChange" />
-        <a-card v-else>
-          <a-form :form="form" layout="vertical" @submit.prevent="handleSubmit">
-            <a-form-item
-              label="Email"
-            >
-              <a-input
-                v-decorator="[
-                  'email',
-                  {rules: [{ required: true, message: 'Please input your email' }]}
-                ]"
-              />
-            </a-form-item>
-            <a-form-item
-              label="Password"
-            >
-              <a-input
-                type="password"
-                v-decorator="[
-                  'password',
-                  {rules: [{ required: true, message: 'Please input your password' }]}
-                ]"
-              />
-            </a-form-item>
-            <a-form-item>
-              <a-button type="primary" html-type="submit">Submit</a-button>
-            </a-form-item>
-          </a-form>
-        </a-card>
+        <TodoList v-if="token" :dataSource="todos" :tableLoading="tableLoading" :onDataChange="onDataChange" />
+        <Signin v-else :handleSubmit="handleSubmit" />
       </a-col>
     </a-row>
   </div>
 </template>
 
 <script>
-import TodoList from '../components/TodoList';
 import axios from 'axios';
 import jwt from 'jsonwebtoken';
-import { Provider, Consumer } from '../contexts/AppContext';
+
+import TodoList from '../components/TodoList';
+import Signin from '../components/Signin';
+
 export default {
   name: "Home",
   data() {
@@ -50,13 +25,9 @@ export default {
       todos: []
     };
   },
-  beforeCreate() {
-    this.form = this.$form.createForm(this, {});
-  },
   components: {
     TodoList,
-    Provider,
-    Consumer
+    Signin
   },
   mounted() {
     this.checkToken();
@@ -93,7 +64,6 @@ export default {
       });
     },
     onDataChange(data) {
-      console.log(data);
       this.todos = data;
       const user = jwt.decode(this.token);
       axios.put(
@@ -106,17 +76,16 @@ export default {
             'x-access-token': this.token
           },
           validateStatus: () => true
+        }
+      ).then(res => {
+          if(res.status === 200) {
+            console.log('OK')
+          } else {
+            console.log(res.data)
+          }
         })
-          .then(res => {
-            if(res.status === 200) {
-              console.log('OK')
-            } else {
-              console.log(res.data)
-            }
-          })
     },
-    handleSubmit(e) {
-      const { form: { validateFields } } = this;
+    handleSubmit(validateFields) {
       validateFields((errs, { email, password }) => {
         if(email && password) {
           axios.post('http://localhost:3000/auth', {

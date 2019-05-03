@@ -1,12 +1,6 @@
 require('dotenv').config();
 
 const low = require('../db');
-try {
-    const { db } = low.adapter();
-    console.log(db);
-} catch(err) {
-    console.log(err);
-}
 const jwt = require('jsonwebtoken');
 
 module.exports.signin = async function(req, res, next) {

@@ -3,8 +3,8 @@ const router = express.Router();
 
 // const todoRoute = require('./todo.route');
 
-const controller = require('../../controllers/user/index.controller');
-const todoController = require('../../controllers/user/todo.controller');
+const controller = require('../controllers/user/index.controller');
+const todoController = require('../controllers/user/todo.controller');
 
 router.get('/:id/todos', todoController.get);
 
